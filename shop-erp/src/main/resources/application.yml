@@ -1,0 +1,27 @@
+# 应用服务 WEB 访问端口
+server:
+  port: 8080
+  servlet:
+    context-path: /shop-erp
+#数据源配置
+spring:
+  datasource:
+    url: jdbc:mysql:///shop_erp?characterEncoding=UTF8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+#Mybatis-Plus配置
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*Mapper.xml
+  type-aliases-package: com.gs.shop.erp.model.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# Gemini AI配置
+gemini:
+  api-key: AIzaSyAOfxRa9YT1IOmH3Blu2wNPZq931ThPNfoc
+  api-url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent

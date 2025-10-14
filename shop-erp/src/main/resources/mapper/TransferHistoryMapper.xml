@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gs.shop.erp.mapper.TransferHistoryMapper">
+
+    <!--返回集合-->
+    <resultMap type="com.gs.shop.erp.model.entity.TransferHistoryEntity" id="TransferHistoryResultMap">
+        <id property="id" column="id"/>
+        <result property="source" column="source"/>
+        <result property="target" column="target"/>
+        <result property="goodsId" column="goods_id"/>
+        <result property="count" column="count"/>
+        <result property="createUserId" column="create_user_id"/>
+        <result property="updateUserId" column="update_user_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+</mapper>
