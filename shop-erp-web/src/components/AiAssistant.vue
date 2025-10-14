@@ -72,10 +72,32 @@
               </a-button>
             </template>
           </a-input>
+          
+          <!-- 常见问题示例 -->
+          <div class="ai-examples" v-if="messages.length <= 1">
+            <div class="ai-example-title">您可以问：</div>
+            <div class="ai-example-buttons">
+              <a-button size="small" @click="sendExample('当前库存不足的商品有哪些？')">库存不足</a-button>
+              <a-button size="small" @click="sendExample('上月销售总额是多少？')">上月销售</a-button>
+              <a-button size="small" @click="sendExample('最畅销的商品是什么？')">畅销商品</a-button>
+              <a-button size="small" @click="sendExample('查询商品名称')">商品信息</a-button>
+              <a-button size="small" @click="sendExample('最近的进货订单有哪些？')">进货订单</a-button>
+              <a-button size="small" @click="sendExample('客户信息查询')">客户信息</a-button>
+            </div>
+          </div>
+          
           <div class="ai-status">
             <a-tag :color="isHealthy ? 'green' : 'red'" size="small">
               {{ isHealthy ? '服务正常' : '服务异常' }}
             </a-tag>
+            <a-button 
+              v-if="!isHealthy" 
+              size="small" 
+              @click="checkHealth" 
+              style="margin-left: 10px;"
+            >
+              重新检查
+            </a-button>
           </div>
         </div>
       </div>
@@ -144,9 +166,28 @@ export default {
       try {
         const response = await aiHealthCheck()
         this.isHealthy = response.success
+        if (!response.success) {
+          console.error('AI助手健康检查失败:', response.message)
+          // 添加错误消息到聊天记录
+          if (this.messages.length <= 1) {
+            const errorMessage = {
+              type: 'ai',
+              content: `服务暂时不可用: ${response.message}`
+            }
+            this.messages.push(errorMessage)
+          }
+        }
       } catch (error) {
         this.isHealthy = false
         console.error('AI助手健康检查失败:', error)
+        // 添加错误消息到聊天记录
+        if (this.messages.length <= 1) {
+          const errorMessage = {
+            type: 'ai',
+            content: '服务暂时不可用，请稍后再试。'
+          }
+          this.messages.push(errorMessage)
+        }
       }
     },
     async sendMessage() {
@@ -198,6 +239,10 @@ export default {
           this.scrollToBottom()
         })
       }
+    },
+    sendExample(query) {
+      this.inputMessage = query;
+      this.sendMessage();
     },
     scrollToBottom() {
       this.$nextTick(() => {
@@ -345,9 +390,32 @@ export default {
   border-top: 1px solid #eee;
 }
 
+.ai-examples {
+  margin-top: 10px;
+}
+
+.ai-example-title {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 5px;
+}
+
+.ai-example-buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.ai-example-buttons .ant-btn {
+  font-size: 12px;
+}
+
 .ai-status {
   margin-top: 10px;
   text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 @media (max-width: 768px) {

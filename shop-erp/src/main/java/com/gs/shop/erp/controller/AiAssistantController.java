@@ -1,6 +1,7 @@
 package com.gs.shop.erp.controller;
 
 import com.gs.shop.erp.service.AiAssistantService;
+import com.gs.shop.erp.service.AiHealthCheckService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 public class AiAssistantController {
     
     private final AiAssistantService aiAssistantService;
+    private final AiHealthCheckService aiHealthCheckService;
     
     /**
      * AI助手问答接口
@@ -57,10 +59,12 @@ public class AiAssistantController {
     public Map<String, Object> healthCheck() {
         Map<String, Object> result = new HashMap<>();
         try {
-            // 实际测试AI服务的连通性
-            boolean isHealthy = aiAssistantService.testConnection();
-            result.put("success", isHealthy);
-            result.put("message", isHealthy ? "AI助手服务运行正常" : "AI助手服务连接异常");
+            // 使用详细的健康检查
+            AiHealthCheckService.HealthCheckResult healthResult = aiHealthCheckService.detailedHealthCheck();
+            result.put("success", healthResult.isSuccess());
+            result.put("message", healthResult.getMessage());
+            result.put("httpStatusCode", healthResult.getHttpStatusCode());
+            // 不返回响应体以避免泄露敏感信息
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "AI助手服务连接异常: " + e.getMessage());

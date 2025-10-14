@@ -27,6 +27,12 @@ public class GeminiService {
      */
     public String chat(String prompt) {
         try {
+            // 检查API密钥是否配置
+            if (geminiConfig.getApiKey() == null || geminiConfig.getApiKey().isEmpty()) {
+                log.error("Gemini API密钥未配置");
+                return "抱歉，AI助手暂时无法回答您的问题。";
+            }
+            
             RestTemplate restTemplate = new RestTemplate();
             
             // 设置请求头
@@ -45,6 +51,8 @@ public class GeminiService {
             
             // 发送请求
             String url = geminiConfig.getApiUrl() + "?key=" + geminiConfig.getApiKey();
+            log.info("调用Gemini API: {}", url);
+            
             ResponseEntity<String> response = restTemplate.postForEntity(
                 url,
                 requestEntity,
@@ -53,15 +61,24 @@ public class GeminiService {
             
             // 检查响应状态
             if (response.getStatusCode() != HttpStatus.OK) {
-                log.error("调用Gemini API失败，状态码: {}", response.getStatusCode());
+                log.error("调用Gemini API失败，状态码: {}，响应内容: {}", response.getStatusCode(), response.getBody());
                 return "抱歉，AI助手暂时无法回答您的问题。";
             }
             
             // 记录响应内容用于调试
-            log.info("API响应内容: {}", response.getBody());
+            log.info("API响应状态码: {}, 响应内容: {}", response.getStatusCode(), response.getBody());
             
             // 解析响应
             JsonNode jsonResponse = objectMapper.readTree(response.getBody());
+            
+            // 检查是否有错误信息
+            if (jsonResponse.has("error")) {
+                JsonNode errorNode = jsonResponse.path("error");
+                String errorMessage = errorNode.path("message").asText("未知错误");
+                log.error("Gemini API返回错误: {}", errorMessage);
+                return "抱歉，AI助手暂时无法回答您的问题。";
+            }
+            
             JsonNode candidatesNode = jsonResponse.path("candidates");
             if (candidatesNode.isArray() && candidatesNode.size() > 0) {
                 JsonNode contentNode = candidatesNode.get(0).path("content");

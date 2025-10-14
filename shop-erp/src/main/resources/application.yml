@@ -23,5 +23,5 @@ mybatis-plus:
 
 # Gemini AI配置
 gemini:
-  api-key: AIzaSyAOfxRa9YT1IOmH3Blu2wNPZq931ThPNfoc
+  api-key: AIzaSyAOfxRa9YT1IOmH3Blu2wNPZq931ThPNfo
   api-url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
