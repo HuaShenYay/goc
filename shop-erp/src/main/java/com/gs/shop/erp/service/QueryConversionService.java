@@ -55,6 +55,14 @@ public class QueryConversionService {
                 return generateSupplierInfoQuery(naturalLanguageQuery);
             } else if (lowerQuery.contains("仓库信息") || lowerQuery.contains("仓库详情")) {
                 return generateRepositoryInfoQuery(naturalLanguageQuery);
+            } else if (lowerQuery.contains("仓库数量") || lowerQuery.contains("仓库总数")) {
+                return generateRepositoryCountQuery();
+            } else if (lowerQuery.contains("商品数量") || lowerQuery.contains("商品总数")) {
+                return generateGoodsCountQuery();
+            } else if (lowerQuery.contains("客户数量") || lowerQuery.contains("客户总数")) {
+                return generateCustomerCountQuery();
+            } else if (lowerQuery.contains("供应商数量") || lowerQuery.contains("供应商总数")) {
+                return generateSupplierCountQuery();
             } else if (lowerQuery.contains("进货订单") || lowerQuery.contains("采购订单")) {
                 return generatePurchaseOrderQuery();
             } else if (lowerQuery.contains("销售订单")) {
@@ -298,6 +306,38 @@ public class QueryConversionService {
         return "SELECT r.name AS 仓库名称, r.address AS 地址 " +
                "FROM repository r " +
                "LIMIT 20";
+    }
+    
+    /**
+     * 生成仓库数量查询
+     * @return SQL查询语句
+     */
+    private String generateRepositoryCountQuery() {
+        return "SELECT COUNT(*) AS 仓库数量 FROM repository r";
+    }
+    
+    /**
+     * 生成商品数量查询
+     * @return SQL查询语句
+     */
+    private String generateGoodsCountQuery() {
+        return "SELECT COUNT(*) AS 商品数量 FROM goods g";
+    }
+    
+    /**
+     * 生成客户数量查询
+     * @return SQL查询语句
+     */
+    private String generateCustomerCountQuery() {
+        return "SELECT COUNT(*) AS 客户数量 FROM customer c";
+    }
+    
+    /**
+     * 生成供应商数量查询
+     * @return SQL查询语句
+     */
+    private String generateSupplierCountQuery() {
+        return "SELECT COUNT(*) AS 供应商数量 FROM supplier s";
     }
     
     /**
