@@ -40,21 +40,31 @@ public class AiAssistantService {
      */
     public String processQuery(String query) {
         try {
+            log.info("开始处理用户查询: {}", query);
+            
             // 首先尝试将自然语言转换为SQL查询
             String sqlQuery = queryConversionService.convertToSQL(query);
+            log.info("SQL转换结果: {}", sqlQuery);
             
             // 如果成功生成SQL，则执行查询并返回结果
             if (sqlQuery != null && !sqlQuery.isEmpty()) {
+                log.info("执行数据库查询: {}", sqlQuery);
                 String queryResult = queryExecutionService.executeQuery(sqlQuery);
+                log.info("数据库查询结果: {}", queryResult);
+                
                 String prompt = String.format(
                     "请根据以下数据库查询结果，用简洁明了的语言回答用户的问题：%s\n\n查询结果：%s", 
                     query, 
                     queryResult
                 );
-                return geminiService.chat(prompt);
+                log.info("发送给AI模型的提示: {}", prompt);
+                String aiResponse = geminiService.chat(prompt);
+                log.info("AI模型响应: {}", aiResponse);
+                return aiResponse;
             }
             
             // 如果无法生成SQL查询，则直接让AI回答
+            log.info("无法生成SQL查询，直接由AI回答");
             String prompt = String.format(
                 "你是一个进销存管理系统的AI助手，请根据用户的问题提供帮助。问题是：%s\n\n" +
                 "以下是系统的数据结构信息：\n" +
@@ -73,7 +83,9 @@ public class AiAssistantService {
                 query
             );
             
-            return geminiService.chat(prompt);
+            String aiResponse = geminiService.chat(prompt);
+            log.info("AI模型响应: {}", aiResponse);
+            return aiResponse;
         } catch (Exception e) {
             log.error("处理用户查询时发生错误", e);
             return "抱歉，AI助手暂时无法回答您的问题。";

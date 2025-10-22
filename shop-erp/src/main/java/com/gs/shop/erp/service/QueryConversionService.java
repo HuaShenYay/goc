@@ -69,6 +69,14 @@ public class QueryConversionService {
                 return generateSaleOrderQuery();
             } else if (lowerQuery.contains("转仓记录")) {
                 return generateTransferHistoryQuery();
+            } else if (lowerQuery.contains("仓库分布") || lowerQuery.contains("仓库地区")) {
+                return generateRepositoryDistributionQuery();
+            } else if (lowerQuery.contains("入库记录")) {
+                if (lowerQuery.contains("多少条") || lowerQuery.contains("多少") || lowerQuery.contains("总数")) {
+                    return generateInboundRecordCountQuery();
+                } else {
+                    return generateInboundRecordQuery();
+                }
             }
             
             // 如果没有匹配的模式，返回null表示无法转换
@@ -377,6 +385,36 @@ public class QueryConversionService {
                "JOIN repository r2 ON th.target = r2.id " +
                "JOIN goods g ON th.goods_id = g.id " +
                "ORDER BY th.create_time DESC " +
+               "LIMIT 20";
+    }
+    
+    /**
+     * 生成仓库分布地区查询
+     * @return SQL查询语句
+     */
+    private String generateRepositoryDistributionQuery() {
+        return "SELECT DISTINCT r.province AS 省份, r.city AS 城市 FROM repository r ORDER BY r.province, r.city";
+    }
+    
+    /**
+     * 生成入库记录数量查询
+     * @return SQL查询语句
+     */
+    private String generateInboundRecordCountQuery() {
+        return "SELECT COUNT(*) AS 入库记录总数 FROM purchase_sale_history psh WHERE psh.type = 1";
+    }
+    
+    /**
+     * 生成入库记录查询
+     * @return SQL查询语句
+     */
+    private String generateInboundRecordQuery() {
+        return "SELECT psh.id AS 记录ID, r.name AS 仓库名称, g.name AS 商品名称, psh.count AS 数量, psh.create_time AS 入库时间 " +
+               "FROM purchase_sale_history psh " +
+               "JOIN repository r ON psh.repository_id = r.id " +
+               "JOIN goods g ON psh.goods_id = g.id " +
+               "WHERE psh.type = 1 " +
+               "ORDER BY psh.create_time DESC " +
                "LIMIT 20";
     }
     
